@@ -3,6 +3,7 @@ project(METIS C)
 
 set(GKRAND ON CACHE BOOL "enable GKRAND support?" FORCE)
 
+#include(SubmoduleInit.cmake)
 include(GKlib/GKlibSystem.cmake)
 
 # Find sources.
