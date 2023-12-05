@@ -28,8 +28,8 @@ configure_file(include/metis.h.in include/metis.h @ONLY)
 ## Find sources.
 file(GLOB METIS_SRC libmetis/*.c)
 add_library(${PROJECT_NAME} SHARED ${GKlib_sources} ${METIS_SRC})
-target_include_directories(metis PRIVATE GKlib)
-target_include_directories(metis PUBLIC ${CMAKE_CURRENT_BINARY_DIR}/include) #Include the generated metis file
+target_include_directories(${PROJECT_NAME} PRIVATE GKlib)
+target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_BINARY_DIR}/include) #Include the generated metis file
 
 
 ## Artifacts from old cmake used in SOFA
@@ -47,4 +47,13 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
         FRAMEWORK TRUE
         PUBLIC_HEADER ${CMAKE_CURRENT_BINARY_DIR}/include/metis.h)
 
+
+include(CMakePackageConfigHelpers)
+configure_package_config_file(MetisConfig.cmake.in
+        ${CMAKE_CURRENT_BINARY_DIR}/MetisConfig.cmake
+        INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake)
+
+
 install(TARGETS ${PROJECT_NAME})
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/MetisConfig.cmake
+        DESTINATION cmake)
