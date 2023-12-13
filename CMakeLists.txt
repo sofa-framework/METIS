@@ -4,6 +4,7 @@ project(metis C)
 set(GKRAND ON CACHE BOOL "enable GKRAND support?" FORCE)
 
 include(SubmoduleInit.cmake)
+get_filename_component(GKLIB_PATH "GKlib" ABSOLUTE)
 include(GKlib/GKlibSystem.cmake)
 
 if("x${CMAKE_CXX_COMPILER_ID}" STREQUAL "xGNU" OR "x${CMAKE_CXX_COMPILER_ID}" STREQUAL "xClang")
