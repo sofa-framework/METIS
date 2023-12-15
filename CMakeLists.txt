@@ -1,45 +1,60 @@
-cmake_minimum_required(VERSION 2.8)
-project(METIS C)
+cmake_minimum_required(VERSION 3.22)
+project(metis C)
 
-set(GKLIB_PATH "${CMAKE_SOURCE_DIR}/GKlib" CACHE PATH "path to GKlib")
-set(SHARED FALSE CACHE BOOL "build a shared library")
+set(GKRAND ON CACHE BOOL "enable GKRAND support?" FORCE)
 
-if(MSVC)
-  set(METIS_INSTALL FALSE)
-else()
-  set(METIS_INSTALL TRUE)
+include(SubmoduleInit.cmake)
+get_filename_component(GKLIB_PATH "GKlib" ABSOLUTE)
+include(GKlib/GKlibSystem.cmake)
+
+if("x${CMAKE_CXX_COMPILER_ID}" STREQUAL "xGNU" OR "x${CMAKE_CXX_COMPILER_ID}" STREQUAL "xClang")
+    add_compile_options(-fPIC)
 endif()
 
-# Configure libmetis library.
-if(SHARED)
-  set(METIS_LIBRARY_TYPE SHARED)
-else()
-  set(METIS_LIBRARY_TYPE STATIC)
-endif(SHARED)
+## Set precision used in metis and generate corresponding header file
+option(USE_64BIT_IDX "Use long int for ids" OFF)
+option(USE_64BIT_REAL "Use double precision" OFF)
 
-include(${GKLIB_PATH}/GKlibSystem.cmake)
+set(IDXTYPE  32)
+set(REALTYPE 32)
 
-# METIS' custom options
-#option(IDX64 "enable 64 bit ints" OFF)
-#option(REAL64 "enable 64 bit floats (i.e., double)" OFF)
-#if(IDX64)
-#  set(METIS_COPTIONS "${METIS_COPTIONS} -DIDXTYPEWIDTH=64")
-#else()
-#  set(METIS_COPTIONS "${METIS_COPTIONS} -DIDXTYPEWIDTH=32")
-#endif(IDX64)
-#if(REAL64)
-#  set(METIS_COPTIONS "${METIS_COPTIONS} -DREALTYPEWIDTH=64")
-#else()
-#  set(METIS_COPTIONS "${METIS_COPTIONS} -DREALTYPEWIDTH=32")
-#endif(REAL64)
-#
-#set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${METIS_COPTIONS}")
+if(USE_64BIT_IDX)
+    set(IDXTYPE 64)
+endif()
+if(USE_64BIT_REAL)
+    set(REALTYPE  64)
+endif()
+configure_file(include/metis.h.in include/metis.h @ONLY)
+
+## Find sources.
+file(GLOB METIS_SRC libmetis/*.c)
+add_library(${PROJECT_NAME} SHARED ${GKlib_sources} ${METIS_SRC})
+target_include_directories(${PROJECT_NAME} PRIVATE GKlib)
+target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_BINARY_DIR}/include) #Include the generated metis file
 
 
-# Add include directories.
-include_directories(${GKLIB_PATH})
-include_directories(build/xinclude)
-# Recursively look for CMakeLists.txt in subdirs.
-add_subdirectory("build/xinclude")
-add_subdirectory("libmetis")
-add_subdirectory("programs")
+## Artifacts from old cmake used in SOFA
+if(UNIX)
+    target_link_libraries(${PROJECT_NAME} m)
+endif()
+
+if(WIN32)
+    # remove warnings about deprecation (CRT,etc)
+    target_compile_options(${PROJECT_NAME} PRIVATE "/wd4996")
+endif()
+
+## Install configuration
+set_target_properties(${PROJECT_NAME} PROPERTIES
+        FRAMEWORK TRUE
+        PUBLIC_HEADER ${CMAKE_CURRENT_BINARY_DIR}/include/metis.h)
+
+
+include(CMakePackageConfigHelpers)
+configure_package_config_file(MetisConfig.cmake.in
+        ${CMAKE_CURRENT_BINARY_DIR}/MetisConfig.cmake
+        INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake)
+
+
+install(TARGETS ${PROJECT_NAME})
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/MetisConfig.cmake
+        DESTINATION cmake)
