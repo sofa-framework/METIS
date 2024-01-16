@@ -1094,6 +1094,7 @@ graph_t *SetupCoarseGraph(graph_t *graph, idx_t cnvtxs, int dovsize)
   cgraph->xadj     = imalloc(cnvtxs+1, "SetupCoarseGraph: xadj");
   cgraph->adjncy   = imalloc(graph->nedges+1,   "SetupCoarseGraph: adjncy");
   cgraph->adjwgt   = imalloc(graph->nedges+1,   "SetupCoarseGraph: adjwgt");
+
   cgraph->vwgt     = imalloc(cgraph->ncon*cnvtxs, "SetupCoarseGraph: vwgt");
   cgraph->tvwgt    = imalloc(cgraph->ncon, "SetupCoarseGraph: tvwgt");
   cgraph->invtvwgt = rmalloc(cgraph->ncon, "SetupCoarseGraph: invtvwgt");
