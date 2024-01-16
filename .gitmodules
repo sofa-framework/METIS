@@ -1,0 +1,4 @@
+[submodule "GKlib"]
+	path = GKlib
+	url = https://github.com/KarypisLab/GKlib.git
+    tag = METIS-v5.1.1-DistDGL-0.5
