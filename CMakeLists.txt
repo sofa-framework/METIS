@@ -12,6 +12,11 @@ if("x${CMAKE_CXX_COMPILER_ID}" STREQUAL "xGNU" OR "x${CMAKE_CXX_COMPILER_ID}" ST
     add_compile_options(-fPIC)
 endif()
 
+
+if(WIN32)
+    set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
+endif()
+
 ## Set precision used in metis and generate corresponding header file
 option(USE_64BIT_IDX "Use long int for ids" OFF)
 option(USE_64BIT_REAL "Use double precision" OFF)
@@ -44,7 +49,6 @@ endif()
 if(WIN32)
     # remove warnings about deprecation (CRT,etc)
     target_compile_options(${PROJECT_NAME} PRIVATE "/wd4996")
-    set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
 endif()
 
 ## Install configuration
