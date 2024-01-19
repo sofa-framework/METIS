@@ -44,6 +44,7 @@ endif()
 if(WIN32)
     # remove warnings about deprecation (CRT,etc)
     target_compile_options(${PROJECT_NAME} PRIVATE "/wd4996")
+    set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
 endif()
 
 ## Install configuration
