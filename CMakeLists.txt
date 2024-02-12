@@ -1,28 +1,47 @@
-cmake_minimum_required(VERSION 3.12)
-project(metis)
+cmake_minimum_required(VERSION 3.22)
+project(metis C)
 
-unset(GKLIB_PATH CACHE)
+
+set(GKRAND ON CACHE BOOL "enable GKRAND support?" FORCE)
+
 get_filename_component(GKLIB_PATH "GKlib" ABSOLUTE)
 include(GKlib/GKlibSystem.cmake)
 
-file(GLOB metis_sources libmetis/*.c libmetis/*.h include/*.h)
-
-# The code must be relocatable if we want to link a shared library against it.
 if("x${CMAKE_CXX_COMPILER_ID}" STREQUAL "xGNU" OR "x${CMAKE_CXX_COMPILER_ID}" STREQUAL "xClang")
     add_compile_options(-fPIC)
 endif()
 
-add_library(${PROJECT_NAME} STATIC ${metis_sources} ${GKlib_sources})
-target_include_directories(${PROJECT_NAME} PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/GKlib>")
-target_include_directories(${PROJECT_NAME} PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/libmetis>")
 
-# Disable warnings coming from the metis library
-target_compile_options(${PROJECT_NAME} PRIVATE
-     $<$<OR:$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:AppleClang>,$<CXX_COMPILER_ID:GNU>>:
-          -w>
-     $<$<CXX_COMPILER_ID:MSVC>:
-          /w>)
+if(WIN32)
+    set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
+endif()
 
+## Set precision used in metis and generate corresponding header file
+option(USE_64BIT_IDX "Use long int for ids" OFF)
+option(USE_64BIT_REAL "Use double precision" OFF)
+
+
+set(IDXTYPE  32)
+set(REALTYPE 32)
+
+if(USE_64BIT_IDX)
+    set(IDXTYPE 64)
+endif()
+if(USE_64BIT_REAL)
+    set(REALTYPE  64)
+endif()
+configure_file(include/metis.h.in include/metis.h @ONLY)
+
+## Find sources.
+file(GLOB METIS_SRC libmetis/*.c libmetis/*.h)
+add_library(${PROJECT_NAME} SHARED ${GKlib_sources} ${METIS_SRC})
+target_include_directories(${PROJECT_NAME} PRIVATE GKlib)
+target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/libmetis)
+target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_BINARY_DIR}/include) #Include the generated metis file
+
+
+
+## Artifacts from old cmake used in SOFA
 if(UNIX)
     target_link_libraries(${PROJECT_NAME} m)
 endif()
@@ -32,10 +51,18 @@ if(WIN32)
     target_compile_options(${PROJECT_NAME} PRIVATE "/wd4996")
 endif()
 
-sofa_create_package_with_targets(
-    PACKAGE_NAME Metis
-    PACKAGE_VERSION 5.1.0
-    TARGETS metis AUTO_SET_TARGET_PROPERTIES
-    INCLUDE_SOURCE_DIR "include"
-    INCLUDE_INSTALL_DIR "extlibs/Metis"
-    )
+## Install configuration
+set_target_properties(${PROJECT_NAME} PROPERTIES
+        FRAMEWORK TRUE
+        PUBLIC_HEADER ${CMAKE_CURRENT_BINARY_DIR}/include/metis.h)
+
+
+include(CMakePackageConfigHelpers)
+configure_package_config_file(MetisConfig.cmake.in
+        ${CMAKE_CURRENT_BINARY_DIR}/MetisConfig.cmake
+        INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake)
+
+
+install(TARGETS ${PROJECT_NAME})
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/MetisConfig.cmake
+        DESTINATION cmake)
