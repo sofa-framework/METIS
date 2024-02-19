@@ -37,7 +37,8 @@ file(GLOB METIS_SRC libmetis/*.c libmetis/*.h)
 add_library(${PROJECT_NAME} SHARED ${GKlib_sources} ${METIS_SRC})
 target_include_directories(${PROJECT_NAME} PRIVATE GKlib)
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/libmetis)
-target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_BINARY_DIR}/include) #Include the generated metis file
+target_include_directories(${PROJECT_NAME} PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>) #Include the generated metis file
+target_include_directories(${PROJECT_NAME} PUBLIC $<INSTALL_INTERFACE:include>) #Include the generated metis file
 
 
 
@@ -63,6 +64,11 @@ configure_package_config_file(MetisConfig.cmake.in
         INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake)
 
 
-install(TARGETS ${PROJECT_NAME})
+install(TARGETS ${PROJECT_NAME} EXPORT ${PROJECT_NAME})
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/MetisConfig.cmake
         DESTINATION cmake)
+
+
+install(EXPORT ${PROJECT_NAME}
+    DESTINATION ${CMAKE_CURRENT_BINARY_DIR}
+    FILE MetisConfig.cmake)
