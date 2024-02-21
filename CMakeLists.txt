@@ -57,18 +57,13 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
         FRAMEWORK TRUE
         PUBLIC_HEADER ${CMAKE_CURRENT_BINARY_DIR}/include/metis.h)
 
+configure_package_config_file(metisConfig.cmake.in
+        ${CMAKE_CURRENT_BINARY_DIR}/metisConfig.cmake
+        INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME})
 
-include(CMakePackageConfigHelpers)
-configure_package_config_file(MetisConfig.cmake.in
-        ${CMAKE_CURRENT_BINARY_DIR}/MetisConfig.cmake
-        INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake)
-
-
-install(TARGETS ${PROJECT_NAME} EXPORT ${PROJECT_NAME})
-install(FILES ${CMAKE_CURRENT_BINARY_DIR}/MetisConfig.cmake
-        DESTINATION cmake)
+# Install the header file and export the target
+install(TARGETS ${PROJECT_NAME} EXPORT ${PROJECT_NAME}Targets DESTINATION ${CMAKE_INSTALL_LIBDIR} PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+install(EXPORT ${PROJECT_NAME}Targets FILE ${PROJECT_NAME}Targets.cmake  DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME})
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/metisConfig.cmake DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME})
 
 
-install(EXPORT ${PROJECT_NAME}
-    DESTINATION ${CMAKE_CURRENT_BINARY_DIR}
-    FILE MetisConfig.cmake)
