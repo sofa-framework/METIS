@@ -4,7 +4,6 @@ project(metis C)
 
 set(GKRAND ON CACHE BOOL "enable GKRAND support?" FORCE)
 
-include(SubmoduleInit.cmake)
 get_filename_component(GKLIB_PATH "GKlib" ABSOLUTE)
 include(GKlib/GKlibSystem.cmake)
 
@@ -34,10 +33,12 @@ endif()
 configure_file(include/metis.h.in include/metis.h @ONLY)
 
 ## Find sources.
-file(GLOB METIS_SRC libmetis/*.c)
+file(GLOB METIS_SRC libmetis/*.c libmetis/*.h)
 add_library(${PROJECT_NAME} SHARED ${GKlib_sources} ${METIS_SRC})
 target_include_directories(${PROJECT_NAME} PRIVATE GKlib)
-target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_BINARY_DIR}/include) #Include the generated metis file
+target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/libmetis)
+target_include_directories(${PROJECT_NAME} PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>) #Include the generated metis file
+target_include_directories(${PROJECT_NAME} PUBLIC $<INSTALL_INTERFACE:include>) #Include the generated metis file
 
 
 
@@ -56,13 +57,13 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
         FRAMEWORK TRUE
         PUBLIC_HEADER ${CMAKE_CURRENT_BINARY_DIR}/include/metis.h)
 
+configure_package_config_file(metisConfig.cmake.in
+        ${CMAKE_CURRENT_BINARY_DIR}/metisConfig.cmake
+        INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME})
 
-include(CMakePackageConfigHelpers)
-configure_package_config_file(MetisConfig.cmake.in
-        ${CMAKE_CURRENT_BINARY_DIR}/MetisConfig.cmake
-        INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake)
+# Install the header file and export the target
+install(TARGETS ${PROJECT_NAME} EXPORT ${PROJECT_NAME}Targets DESTINATION ${CMAKE_INSTALL_LIBDIR} PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+install(EXPORT ${PROJECT_NAME}Targets FILE ${PROJECT_NAME}Targets.cmake  DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME})
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/metisConfig.cmake DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME})
 
 
-install(TARGETS ${PROJECT_NAME})
-install(FILES ${CMAKE_CURRENT_BINARY_DIR}/MetisConfig.cmake
-        DESTINATION cmake)
