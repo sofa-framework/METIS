@@ -57,6 +57,7 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
         FRAMEWORK TRUE
         PUBLIC_HEADER ${CMAKE_CURRENT_BINARY_DIR}/include/metis.h)
 
+include(CMakePackageConfigHelpers)
 configure_package_config_file(metisConfig.cmake.in
         ${CMAKE_CURRENT_BINARY_DIR}/metisConfig.cmake
         INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME})
