@@ -4,6 +4,7 @@ project(metis C)
 
 set(GKRAND ON CACHE BOOL "enable GKRAND support?" FORCE)
 
+include(SubmoduleInit.cmake)
 get_filename_component(GKLIB_PATH "GKlib" ABSOLUTE)
 include(GKlib/GKlibSystem.cmake)
 
@@ -57,6 +58,7 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
         FRAMEWORK TRUE
         PUBLIC_HEADER ${CMAKE_CURRENT_BINARY_DIR}/include/metis.h)
 
+include(CMakePackageConfigHelpers)
 configure_package_config_file(metisConfig.cmake.in
         ${CMAKE_CURRENT_BINARY_DIR}/metisConfig.cmake
         INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME})
