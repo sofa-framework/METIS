@@ -1,4 +1,4 @@
-set(Metis_VERSION 5.1.0)
+set(metis_VERSION 5.1.0)
 
 @PACKAGE_INIT@
 
