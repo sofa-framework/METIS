@@ -6,6 +6,8 @@ set(GKRAND ON CACHE BOOL "enable GKRAND support?" FORCE)
 
 get_filename_component(GKLIB_PATH "GKlib" ABSOLUTE)
 include(GKlib/GKlibSystem.cmake)
+include(GNUInstallDirs)
+
 
 if("x${CMAKE_CXX_COMPILER_ID}" STREQUAL "xGNU" OR "x${CMAKE_CXX_COMPILER_ID}" STREQUAL "xClang")
     add_compile_options(-fPIC)
