@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.22)
-project(metis C)
+project(metis LANGUAGES C VERSION 5.2.1)
 
 
 set(GKRAND ON CACHE BOOL "enable GKRAND support?" FORCE)
@@ -62,9 +62,18 @@ include(CMakePackageConfigHelpers)
 configure_package_config_file(metisConfig.cmake.in
         ${CMAKE_CURRENT_BINARY_DIR}/metisConfig.cmake
         INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME})
-
+write_basic_package_version_file(
+        "${CMAKE_CURRENT_BINARY_DIR}/metisConfigVersion.cmake"
+        VERSION "5.2.1"
+        COMPATIBILITY AnyNewerVersion
+)
 # Install the header file and export the target
-install(TARGETS ${PROJECT_NAME} EXPORT ${PROJECT_NAME}Targets DESTINATION ${CMAKE_INSTALL_LIBDIR} PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+install(TARGETS ${PROJECT_NAME}
+        EXPORT ${PROJECT_NAME}Targets DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+        RUNTIME DESTINATION "bin" COMPONENT applications
+        LIBRARY DESTINATION "lib" COMPONENT libraries
+        ARCHIVE DESTINATION "lib" COMPONENT libraries)
 install(EXPORT ${PROJECT_NAME}Targets FILE ${PROJECT_NAME}Targets.cmake  DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME})
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/metisConfig.cmake DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME})
 
