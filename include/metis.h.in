@@ -15,6 +15,11 @@
 *****************************************************************************/
 
 /*--------------------------------------------------------------------------
+ States if GKRAND has been used for portable random generation
+--------------------------------------------------------------------------*/
+#cmakedefine GKRAND
+
+/*--------------------------------------------------------------------------
  Specifies the width of the elementary data type that will hold information
  about vertices and their adjacency lists.
 
