@@ -56,6 +56,7 @@ endif()
 
 ## Install configuration
 set_target_properties(${PROJECT_NAME} PROPERTIES
+        VERSION 5.1.0
         FRAMEWORK TRUE
         PUBLIC_HEADER ${CMAKE_CURRENT_BINARY_DIR}/include/metis.h)
 
