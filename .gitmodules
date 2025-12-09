@@ -1,4 +1,4 @@
 [submodule "GKlib"]
 	path = GKlib
-	url = https://github.com/KarypisLab/GKlib.git
-    tag = METIS-v5.1.1-DistDGL-0.5
+	url = https://github.com/sofa-framework/GKlib.git
+    tag = METIS-v5.2.1-DistDGL-FIXED
