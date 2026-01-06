@@ -58,7 +58,8 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
         VERSION 5.2.1
         FRAMEWORK TRUE
         PUBLIC_HEADER ${CMAKE_CURRENT_BINARY_DIR}/include/metis.h)
-
+        
+include(GNUInstallDirs)
 include(CMakePackageConfigHelpers)
 configure_package_config_file(metisConfig.cmake.in
         ${CMAKE_CURRENT_BINARY_DIR}/metisConfig.cmake
